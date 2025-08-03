@@ -9,7 +9,7 @@ A simple .NET 8 ASP.NET Core application that broadcasts messages via SignalR ev
 - **CORS enabled**: Ready for cross-origin requests from mobile apps
 - **Health endpoint**: `/health` for monitoring
 - **Test client**: Built-in HTML client for testing
-- **OnRender ready**: Configured for easy deployment
+- **Production ready**: Configured for cloud deployment
 
 ## Quick Start
 
@@ -56,18 +56,9 @@ The application will start on `http://localhost:5000` (or `https://localhost:500
 - `GET /health` - Health check endpoint
 - `WS /chatHub` - SignalR hub connection
 
-## Deployment to OnRender
+## Deployment
 
-### Method 1: Direct Deployment
-
-1. Connect your GitHub repository to OnRender
-2. Create a new Web Service
-3. Use these settings:
-   - **Build Command**: `dotnet publish -c Release -o out`
-   - **Start Command**: `dotnet out/SignalREmitter.dll`
-   - **Environment**: .NET
-
-### Method 2: Using dotnet publish
+### Using dotnet publish
 
 ```bash
 # Build for production
@@ -78,9 +69,19 @@ dotnet publish -c Release -o ./publish
 dotnet SignalREmitter.dll
 ```
 
+### Using Docker
+
+```bash
+# Build Docker image
+docker build -t signalr-emitter .
+
+# Run container
+docker run -p 80:80 signalr-emitter
+```
+
 ## Environment Variables
 
-The application uses standard ASP.NET Core configuration. For OnRender, these are automatically configured:
+The application uses standard ASP.NET Core configuration:
 
 - `ASPNETCORE_ENVIRONMENT=Production`
 - `ASPNETCORE_URLS=http://0.0.0.0:$PORT`
@@ -89,7 +90,7 @@ The application uses standard ASP.NET Core configuration. For OnRender, these ar
 
 ### Connection URL
 ```
-wss://your-app-name.onrender.com/chatHub
+wss://your-domain.com/chatHub
 ```
 
 ### Sample Mobile Code (Conceptual)
@@ -97,7 +98,7 @@ wss://your-app-name.onrender.com/chatHub
 ```javascript
 // JavaScript/React Native example
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("wss://your-app-name.onrender.com/chatHub")
+    .withUrl("wss://your-domain.com/chatHub")
     .build();
 
 connection.on("ReceiveMessage", (message) => {
