@@ -28,6 +28,22 @@ app.UseStaticFiles();
 
 app.MapGet("/api", () => "SignalR Emitter is running!");
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+app.MapGet("/api/connections", (ConnectionTracker connectionTracker) => 
+{
+    var connections = connectionTracker.GetActiveConnections().Select(c => new 
+    {
+        connectionId = c.ConnectionId,
+        ipAddress = c.IpAddress,
+        connectedAt = c.ConnectedAt,
+        duration = DateTime.UtcNow - c.ConnectedAt
+    });
+    
+    return Results.Ok(new 
+    {
+        count = connectionTracker.ConnectionCount,
+        connections = connections
+    });
+});
 
 app.MapHub<ChatHub>("/chatHub");
 

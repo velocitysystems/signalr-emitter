@@ -10,6 +10,9 @@
         .disconnected { background-color: #f8d7da; color: #721c24; }
         .messages { height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
         .message { margin: 5px 0; padding: 5px; background-color: #f8f9fa; border-radius: 3px; }
+        .connections { border: 1px solid #ccc; padding: 10px; margin: 10px 0; background-color: #f8f9fa; }
+        .connection-item { margin: 5px 0; padding: 5px; background-color: #ffffff; border-radius: 3px; border-left: 3px solid #007bff; }
+        #connectionCount { font-weight: bold; padding: 3px 0; color: #007bff; }
         button { padding: 10px 20px; margin: 5px; }
     </style>
 </head>
@@ -25,6 +28,12 @@
         
         <h3>Messages:</h3>
         <div id="messages" class="messages"></div>
+        
+        <h3>Current Connections:</h3>
+        <div id="connections" class="connections">
+            <div id="connectionCount">Count: 0</div>
+            <div id="connectionList"></div>
+        </div>
     </div>
 
     <script src="https://unpkg.com/@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
@@ -38,6 +47,8 @@
         const connectBtn = document.getElementById("connectBtn");
         const disconnectBtn = document.getElementById("disconnectBtn");
         const clearBtn = document.getElementById("clearBtn");
+        const connectionCountDiv = document.getElementById("connectionCount");
+        const connectionListDiv = document.getElementById("connectionList");
 
         connection.on("ReceiveMessage", function (message) {
             const messageElement = document.createElement("div");
@@ -80,6 +91,41 @@
         clearBtn.addEventListener("click", function () {
             messagesDiv.innerHTML = "";
         });
+
+        // Function to update connections display
+        async function updateConnections() {
+            try {
+                const response = await fetch('/api/connections');
+                const data = await response.json();
+                
+                connectionCountDiv.textContent = `Count: ${data.count}`;
+                
+                connectionListDiv.innerHTML = '';
+                data.connections.forEach(conn => {
+                    const connDiv = document.createElement('div');
+                    connDiv.className = 'connection-item';
+                    
+                    const duration = Math.floor(conn.duration.totalSeconds || 0);
+                    const durationText = duration > 60 ? `${Math.floor(duration/60)}m ${duration%60}s` : `${duration}s`;
+                    
+                    connDiv.innerHTML = `
+                        <strong>ID:</strong> ${conn.connectionId.substring(0, 8)}...<br>
+                        <strong>IP:</strong> ${conn.ipAddress}<br>
+                        <strong>Connected:</strong> ${new Date(conn.connectedAt).toLocaleTimeString()}<br>
+                        <strong>Duration:</strong> ${durationText}
+                    `;
+                    connectionListDiv.appendChild(connDiv);
+                });
+            } catch (error) {
+                console.error('Error fetching connections:', error);
+            }
+        }
+
+        // Update connections every 2 seconds
+        setInterval(updateConnections, 2000);
+        
+        // Initial load
+        updateConnections();
 
         connection.onclose(function () {
             statusDiv.textContent = "Disconnected";

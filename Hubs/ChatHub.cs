@@ -25,7 +25,8 @@ public class ChatHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        _connectionTracker.AddConnection(Context.ConnectionId);
+        var ipAddress = Context.GetHttpContext()?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown";
+        _connectionTracker.AddConnection(Context.ConnectionId, ipAddress);
         await base.OnConnectedAsync();
     }
 
