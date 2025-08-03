@@ -13,14 +13,18 @@ public class MessageEmitterService : BackgroundService
     private int _messageCounter = 0;
 
     private readonly string[] _sampleMessages = {
-        "Hello from SignalR!",
-        "Testing mobile integration",
-        "Real-time message broadcasting",
-        "SignalR is working perfectly",
-        "Mobile clients should receive this",
-        "Cross-platform messaging test",
-        "Live data streaming active",
-        "Connection status: healthy"
+        "To be, or not to be, that is the question.",
+        "All the world's a stage, and all the men and women merely players.",
+        "Romeo, Romeo, wherefore art thou Romeo?",
+        "What's in a name? That which we call a rose by any other name would smell as sweet.",
+        "The course of true love never did run smooth.",
+        "All that glisters is not gold.",
+        "Brevity is the soul of wit.",
+        "To thine own self be true.",
+        "The lady doth protest too much, methinks.",
+        "Better three hours too soon than a minute too late.",
+        "Now is the winter of our discontent.",
+        "We know what we are, but know not what we may be."
     };
 
     public MessageEmitterService(IHubContext<ChatHub> hubContext, ILogger<MessageEmitterService> logger, ConnectionTracker connectionTracker)
