@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<ConnectionTracker>();
 builder.Services.AddHostedService<MessageEmitterService>();
 
 // Add CORS for mobile client testing

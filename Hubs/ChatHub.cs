@@ -1,9 +1,16 @@
 using Microsoft.AspNetCore.SignalR;
+using SignalREmitter.Services;
 
 namespace SignalREmitter.Hubs;
 
 public class ChatHub : Hub
 {
+    private readonly ConnectionTracker _connectionTracker;
+
+    public ChatHub(ConnectionTracker connectionTracker)
+    {
+        _connectionTracker = connectionTracker;
+    }
     public async Task JoinGroup(string groupName)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
@@ -18,13 +25,13 @@ public class ChatHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        Console.WriteLine($"Client connected: {Context.ConnectionId}");
+        _connectionTracker.AddConnection(Context.ConnectionId);
         await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        Console.WriteLine($"Client disconnected: {Context.ConnectionId}");
+        _connectionTracker.RemoveConnection(Context.ConnectionId);
         await base.OnDisconnectedAsync(exception);
     }
 }

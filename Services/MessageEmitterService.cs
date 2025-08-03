@@ -9,6 +9,7 @@ public class MessageEmitterService : BackgroundService
     private readonly IHubContext<ChatHub> _hubContext;
     private readonly ILogger<MessageEmitterService> _logger;
     private readonly SystemInfo _systemInfo;
+    private readonly ConnectionTracker _connectionTracker;
     private int _messageCounter = 0;
 
     private readonly string[] _sampleMessages = {
@@ -22,10 +23,11 @@ public class MessageEmitterService : BackgroundService
         "Connection status: healthy"
     };
 
-    public MessageEmitterService(IHubContext<ChatHub> hubContext, ILogger<MessageEmitterService> logger)
+    public MessageEmitterService(IHubContext<ChatHub> hubContext, ILogger<MessageEmitterService> logger, ConnectionTracker connectionTracker)
     {
         _hubContext = hubContext;
         _logger = logger;
+        _connectionTracker = connectionTracker;
         _systemInfo = new SystemInfo
         {
             StartTime = DateTime.UtcNow
@@ -40,7 +42,15 @@ public class MessageEmitterService : BackgroundService
         {
             try
             {
-                await BroadcastMessage();
+                if (_connectionTracker.HasConnections)
+                {
+                    await BroadcastMessage();
+                }
+                else
+                {
+                    _logger.LogDebug("No active connections, skipping broadcast");
+                }
+                
                 await Task.Delay(5000, stoppingToken); // 5 seconds
             }
             catch (OperationCanceledException)
@@ -74,12 +84,5 @@ public class MessageEmitterService : BackgroundService
         
         _logger.LogInformation("Broadcasted message #{counter}: {message}", 
             _messageCounter, message.Message);
-
-        // Also send system info periodically (every 10th message)
-        if (_messageCounter % 10 == 0)
-        {
-            await _hubContext.Clients.All.SendAsync("SystemInfo", _systemInfo);
-            _logger.LogInformation("Sent system info update");
-        }
     }
 }
