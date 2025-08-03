@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SignalR Test Client</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background-color: #d4edda; color: #155724; }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+        .messages { height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+        .message { margin: 5px 0; padding: 5px; background-color: #f8f9fa; border-radius: 3px; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SignalR Emitter Test Client</h1>
+        
+        <div id="status" class="status disconnected">Disconnected</div>
+        
+        <button id="connectBtn">Connect</button>
+        <button id="disconnectBtn" disabled>Disconnect</button>
+        <button id="clearBtn">Clear Messages</button>
+        
+        <h3>Messages:</h3>
+        <div id="messages" class="messages"></div>
+    </div>
+
+    <script src="https://unpkg.com/@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chatHub")
+            .build();
+
+        const statusDiv = document.getElementById("status");
+        const messagesDiv = document.getElementById("messages");
+        const connectBtn = document.getElementById("connectBtn");
+        const disconnectBtn = document.getElementById("disconnectBtn");
+        const clearBtn = document.getElementById("clearBtn");
+
+        connection.on("ReceiveMessage", function (message) {
+            const messageElement = document.createElement("div");
+            messageElement.className = "message";
+            messageElement.innerHTML = `
+                <strong>ID:</strong> ${message.id}<br>
+                <strong>Message:</strong> ${message.message}<br>
+                <strong>Counter:</strong> ${message.counter}<br>
+                <strong>Timestamp:</strong> ${new Date(message.timestamp).toLocaleString()}<br>
+                <strong>Type:</strong> ${message.type}<br>
+                <strong>Status:</strong> ${message.status}
+            `;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
+
+
+
+        connectBtn.addEventListener("click", function () {
+            connection.start().then(function () {
+                statusDiv.textContent = "Connected";
+                statusDiv.className = "status connected";
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+            }).catch(function (err) {
+                console.error(err.toString());
+                statusDiv.textContent = "Connection failed: " + err.toString();
+            });
+        });
+
+        disconnectBtn.addEventListener("click", function () {
+            connection.stop().then(function () {
+                statusDiv.textContent = "Disconnected";
+                statusDiv.className = "status disconnected";
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+            });
+        });
+
+        clearBtn.addEventListener("click", function () {
+            messagesDiv.innerHTML = "";
+        });
+
+        connection.onclose(function () {
+            statusDiv.textContent = "Disconnected";
+            statusDiv.className = "status disconnected";
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>
