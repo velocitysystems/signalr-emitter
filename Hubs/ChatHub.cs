@@ -24,7 +24,7 @@ public class ChatHub : Hub
         await Clients.Group(groupName).SendAsync("UserLeft", $"User {Context.ConnectionId} left {groupName}");
     }
 
-    public async Task SendMessage(string content)
+    public async Task ClientMessage(string content)
     {
         var clientMessage = new ClientMessage
         {

@@ -97,8 +97,6 @@
             clientMessagesDiv.scrollTop = clientMessagesDiv.scrollHeight;
         });
 
-
-
         connectBtn.addEventListener("click", function () {
             connection.start().then(function () {
                 statusDiv.textContent = "Connected";
@@ -133,7 +131,7 @@
         sendBtn.addEventListener("click", function () {
             const message = messageInput.value.trim();
             if (message && connection.state === signalR.HubConnectionState.Connected) {
-                connection.invoke("SendMessage", message).catch(function (err) {
+                connection.invoke("ClientMessage", message).catch(function (err) {
                     console.error(err.toString());
                 });
                 messageInput.value = "";
