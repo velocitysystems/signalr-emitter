@@ -45,6 +45,7 @@ app.MapGet("/api/connections", (ConnectionTracker connectionTracker) =>
     });
 });
 
+
 app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

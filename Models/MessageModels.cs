@@ -1,13 +1,10 @@
 namespace SignalREmitter.Models;
 
-public class BroadcastMessage
+public class ClientMessage
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
-    public string Message { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-    public string Type { get; set; } = "broadcast";
-    public int Counter { get; set; }
-    public string Status { get; set; } = "active";
 }
 
 public class SystemInfo

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using SignalREmitter.Services;
+using SignalREmitter.Models;
 
 namespace SignalREmitter.Hubs;
 
@@ -21,6 +22,16 @@ public class ChatHub : Hub
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         await Clients.Group(groupName).SendAsync("UserLeft", $"User {Context.ConnectionId} left {groupName}");
+    }
+
+    public async Task SendMessage(string content)
+    {
+        var clientMessage = new ClientMessage
+        {
+            Content = content
+        };
+
+        await Clients.All.SendAsync("ClientMessage", clientMessage);
     }
 
     public override async Task OnConnectedAsync()
