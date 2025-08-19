@@ -24,14 +24,14 @@ public class ChatHub : Hub
         await Clients.Group(groupName).SendAsync("UserLeft", $"User {Context.ConnectionId} left {groupName}");
     }
 
-    public async Task ClientMessage(string content)
+    public async Task SendMessage(string content)
     {
-        var clientMessage = new ClientMessage
+        var Message = new Message
         {
             Content = content
         };
 
-        await Clients.All.SendAsync("ClientMessage", clientMessage);
+        await Clients.All.SendAsync("SendMessage", Message);
     }
 
     public override async Task OnConnectedAsync()

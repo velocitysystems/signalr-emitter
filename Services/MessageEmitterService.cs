@@ -77,13 +77,13 @@ public class MessageEmitterService : BackgroundService
         _messageCounter++;
         _systemInfo.TotalMessagesSent = _messageCounter;
 
-        var message = new ClientMessage
+        var message = new Message
         {
             Content = _sampleMessages[(_messageCounter - 1) % _sampleMessages.Length],
             Timestamp = DateTime.UtcNow
         };
 
-        await _hubContext.Clients.All.SendAsync("ServerMessage", message);
+        await _hubContext.Clients.All.SendAsync("ReceiveMessage", message);
         
         _logger.LogInformation("Broadcasted message #{counter}: {message}", 
             _messageCounter, message.Content);

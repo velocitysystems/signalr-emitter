@@ -24,7 +24,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>SignalR Emitter Test Client</h1>
+        <h1>SignalR Test Client</h1>
         
         <div id="status" class="status disconnected">Disconnected</div>
         
@@ -73,7 +73,7 @@
         const messageInput = document.getElementById("messageInput");
         const sendBtn = document.getElementById("sendBtn");
 
-        connection.on("ServerMessage", function (message) {
+        connection.on("ReceiveMessage", function (message) {
             const messageElement = document.createElement("div");
             messageElement.className = "message";
             messageElement.innerHTML = `
@@ -85,7 +85,7 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
 
-        connection.on("ClientMessage", function (message) {
+        connection.on("SendMessage", function (message) {
             const messageElement = document.createElement("div");
             messageElement.className = "message client-message";
             messageElement.innerHTML = `
@@ -131,7 +131,7 @@
         sendBtn.addEventListener("click", function () {
             const message = messageInput.value.trim();
             if (message && connection.state === signalR.HubConnectionState.Connected) {
-                connection.invoke("ClientMessage", message).catch(function (err) {
+                connection.invoke("SendMessage", message).catch(function (err) {
                     console.error(err.toString());
                 });
                 messageInput.value = "";
