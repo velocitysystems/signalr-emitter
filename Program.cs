@@ -1,5 +1,6 @@
 using SignalREmitter.Hubs;
 using SignalREmitter.Services;
+using SignalREmitter.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline
 app.UseCors();
+app.UseMiddleware<BearerAuthenticationMiddleware>();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
@@ -47,5 +49,5 @@ app.MapGet("/api/connections", (ConnectionTracker connectionTracker) =>
 
 
 app.MapHub<ChatHub>("/chatHub");
-
+app.MapHub<SecureChatHub>("/secureChatHub");
 app.Run();
