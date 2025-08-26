@@ -7,6 +7,7 @@ namespace SignalREmitter.Services;
 public class MessageEmitterService : BackgroundService
 {
     private readonly IHubContext<ChatHub> _hubContext;
+    private readonly IHubContext<SecureChatHub> _secureHubContext;
     private readonly ILogger<MessageEmitterService> _logger;
     private readonly SystemInfo _systemInfo;
     private readonly ConnectionTracker _connectionTracker;
@@ -27,9 +28,10 @@ public class MessageEmitterService : BackgroundService
         "We know what we are, but know not what we may be."
     };
 
-    public MessageEmitterService(IHubContext<ChatHub> hubContext, ILogger<MessageEmitterService> logger, ConnectionTracker connectionTracker)
+    public MessageEmitterService(IHubContext<ChatHub> hubContext, IHubContext<SecureChatHub> secureHubContext, ILogger<MessageEmitterService> logger, ConnectionTracker connectionTracker)
     {
         _hubContext = hubContext;
+        _secureHubContext = secureHubContext;
         _logger = logger;
         _connectionTracker = connectionTracker;
         _systemInfo = new SystemInfo
@@ -84,6 +86,7 @@ public class MessageEmitterService : BackgroundService
         };
 
         await _hubContext.Clients.All.SendAsync("ReceiveMessage", message);
+        await _secureHubContext.Clients.All.SendAsync("ReceiveMessage", message);
         
         _logger.LogInformation("Broadcasted message #{counter}: {message}", 
             _messageCounter, message.Content);
